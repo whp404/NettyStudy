@@ -4,12 +4,17 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import juejin.www.packet.LoginRequestPacket;
 import juejin.www.packet.LoginResponsePacket;
+import juejin.www.utils.LoginUtil;
 import juejin.www.utils.Session;
 import juejin.www.utils.SessionUtil;
+
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
 import java.util.UUID;
 
+@Slf4j
 public class LoginRequestHandler extends SimpleChannelInboundHandler<LoginRequestPacket> {
 
 
@@ -21,17 +26,13 @@ public class LoginRequestHandler extends SimpleChannelInboundHandler<LoginReques
 
         String userId = randomUserId();
         loginResponsePacket.setUserId(userId);
-        SessionUtil.bindSession(new Session(userId, loginRequestPacket.getUsername()), ctx.channel());
+        loginResponsePacket.setUserName(loginRequestPacket.getUsername());
 
-//        loginResponsePacket.setVersion(loginRequestPacket.getVersion());
-//        if (valid(loginRequestPacket)) {
-//            loginResponsePacket.setSuccess(true);
-//            System.out.println(new Date() + ": 登录成功!");
-//        } else {
-//            loginResponsePacket.setReason("账号密码校验失败");
-//            loginResponsePacket.setSuccess(false);
-//            System.out.println(new Date() + ": 登录失败!");
-//        }
+
+        loginResponsePacket.setSuccess(true);//登录成功
+        log.info("用户登录成功{},对应的userI为{}",loginRequestPacket.getUsername(),userId);
+        SessionUtil.bindSession(new Session(userId,loginRequestPacket.getUsername()),ctx.channel());
+        LoginUtil.markAsLogin(ctx.channel());
 
         // 登录响应
         ctx.channel().writeAndFlush(loginResponsePacket);
