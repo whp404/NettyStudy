@@ -3,16 +3,14 @@ package juejin.www.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import juejin.www.Handler.LogoutResponseHandler;
 import juejin.www.utils.JSONSerializer;
 import juejin.www.utils.Serializer;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static juejin.www.utils.Command.LOGIN_REQUEST;
-import static juejin.www.utils.Command.LOGIN_RESPONSE;
-import static juejin.www.utils.Command.MESSAGE_REQUEST;
-import static juejin.www.utils.Command.MESSAGE_RESPONSE;
+import static juejin.www.utils.Command.*;
 
 
 public class PacketCodeC {
@@ -30,6 +28,22 @@ public class PacketCodeC {
         packetTypeMap.put(LOGIN_RESPONSE, LoginResponsePacket.class);
         packetTypeMap.put(MESSAGE_REQUEST, MessageRequestPacket.class);
         packetTypeMap.put(MESSAGE_RESPONSE, MessageResponsePacket.class);
+
+
+        packetTypeMap.put(MESSAGE_GROUP_CREATE, CreateGroupRequestPacket.class);
+        packetTypeMap.put(MESSAGE_GROUP_CREATE_RESPONSE, CreateGroupResponsePacket.class);
+        packetTypeMap.put(MESSAGE_JOIN_GROUP, JoinGroupRequestPacket.class);
+        packetTypeMap.put(MESSAGE_JOIN_GROUP_RESPONSE, JoinGroupResponsePacket.class);
+        packetTypeMap.put(MESSAGE_QUIT_GROUP, QuitGroupRequestPacket.class);
+        packetTypeMap.put(MESSAGE_QUIT_GROUP_RESPONSE, QuitGroupResponsePacket.class);
+        packetTypeMap.put(LIST_GROUP_MEMBER, ListGroupMembersRequestPacket.class);
+        packetTypeMap.put(LIST_GROUP_MEMBER_RESPONSE, ListGroupMembersResponsePacket.class);
+        packetTypeMap.put(LOG_OUT_MESSAGE, LogoutRequestPacket.class);
+        packetTypeMap.put(LOG_OUT_MESSAGE_RESPONSE, LogoutResponsePacket.class);
+
+
+
+
 
         serializerMap = new HashMap<>();
         Serializer serializer = new JSONSerializer();

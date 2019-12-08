@@ -11,7 +11,7 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if(!LoginUtil.hasLogin(ctx.channel())){
 
-            ctx.channel().close();
+            ctx.channel().close();//没有登录,直接关闭连接
         }else {
             //热插拔 删除后续验证逻辑
             ctx.pipeline().remove(this);

@@ -10,13 +10,12 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import juejin.www.Handler.LoginResponseHandler;
-import juejin.www.Handler.MessageResponseHandler;
-import juejin.www.Handler.MessageToByteEncoderHandler;
-import juejin.www.Handler.PacketDecodeHandler;
-import juejin.www.packet.MessageRequestPacket;
-import juejin.www.packet.PacketCodeC;
-import juejin.www.utils.LoginUtil;
+import juejin.www.Handler.*;
+import juejin.www.command.ConsoleCommandManager;
+import juejin.www.command.LoginConsoleCommand;
+import juejin.www.packet.LoginRequestPacket;
+
+import juejin.www.utils.SessionUtil;
 import juejin.www.utils.Spliter;
 
 import java.util.Date;
@@ -49,6 +48,12 @@ public class NettyClient {
                         ch.pipeline().addLast(new PacketDecodeHandler());
                         ch.pipeline().addLast(new LoginResponseHandler());
                         ch.pipeline().addLast(new MessageResponseHandler());
+                        ch.pipeline().addLast(new CreateGroupResponseHandler());
+                        ch.pipeline().addLast(new JoinGroupResponseHandler());
+                        ch.pipeline().addLast(new QuitGroupResponseHandler());
+                        ch.pipeline().addLast(new ListGroupMembersResponseHandler());
+                        ch.pipeline().addLast(new LogoutResponseHandler());
+
                         ch.pipeline().addLast(new MessageToByteEncoderHandler());
                     }
                 });
@@ -80,20 +85,20 @@ public class NettyClient {
 
 
     private static void startConsoleThread(Channel channel){
+        Scanner scanner = new Scanner(System.in);
+        ConsoleCommandManager consoleCommandManager = new ConsoleCommandManager();
+        LoginConsoleCommand loginConsoleCommand = new LoginConsoleCommand();
         new Thread(()->{
             while(!Thread.interrupted()){
-                if(LoginUtil.hasLogin(channel)){
-                    System.out.println("输入消息发送至服务端: ");
-                    Scanner sc = new Scanner(System.in);
-                    String line = sc.nextLine();
 
-                    MessageRequestPacket packet = new MessageRequestPacket();
-                    packet.setMessage(line);
-                    ByteBuf byteBuf = PacketCodeC.INSTANCE.encode(channel.alloc(), packet);
-                    channel.writeAndFlush(byteBuf);
+                if (!SessionUtil.hasLogin(channel)) {
+                    loginConsoleCommand.exec(scanner, channel);
+                } else {
+                    consoleCommandManager.exec(scanner, channel);
                 }
             }
 
         }).start();
     }
+
 }
